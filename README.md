@@ -131,15 +131,15 @@ git push --set-upstream space HEAD:main
 
 - The Space metadata lives in this folder's `README.md`, which matches Hugging Face's requirement that the YAML block be at the root of the Space repository.
 - This Docker Space is configured to run on port `8000`, and the README metadata sets `app_port: 8000` to match.
-- Root-level files such as `..\inference.py` are intentionally excluded from this deployment path.
+- Repo-level files such as `..\readme\README.md` and `..\hackathon\` are intentionally excluded from this deployment path.
 
 ## Submission Scripts
 
-The hackathon-facing scripts live in the repository root:
+The hackathon-facing scripts now live in this directory:
 
-- `..\inference.py`: submission inference runner using an OpenAI-compatible API.
-- `..\inference_local.py`: local helper for Ollama-style or other OpenAI-compatible endpoints.
-- `..\validate_submission.py`: local validation helper for deployability and log-format checks.
+- `inference.py`: submission inference runner using an OpenAI-compatible API.
+- `inference_local.py`: local helper for Ollama-style or other OpenAI-compatible endpoints.
+- `validate_submission.py`: local validation helper for deployability and log-format checks.
 
 ## Sanity Tests
 
@@ -184,7 +184,10 @@ adaptive_learning_system/
 |-- tests/
 |   `-- test_sanity.py
 |-- client.py
+|-- inference.py
+|-- inference_local.py
 |-- models.py
 |-- openenv.yaml
+|-- validate_submission.py
 `-- pyproject.toml
 ```
