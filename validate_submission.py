@@ -186,9 +186,8 @@ def main() -> int:
     args = parser.parse_args()
 
     python_name = "python.exe" if os.name == "nt" else "python"
-    openenv_name = "openenv.exe" if os.name == "nt" else "openenv"
     python_cmd = find_venv_command(python_name, sys.executable)
-    openenv_cmd = find_venv_command(openenv_name, "openenv")
+    openenv_cmd = [*python_cmd, "-m", "openenv.cli"]
 
     if args.space_url:
         log("Step 1/4: Pinging deployed Space")
