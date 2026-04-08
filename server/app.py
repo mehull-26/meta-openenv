@@ -19,10 +19,10 @@ Endpoints:
 
 Usage:
     # Development (with auto-reload):
-    uvicorn server.app:app --reload --host 0.0.0.0 --port 8000
+    uvicorn server.app:app --reload --host 0.0.0.0 --port 7860
 
     # Production:
-    uvicorn server.app:app --host 0.0.0.0 --port 8000 --workers 4
+    uvicorn server.app:app --host 0.0.0.0 --port 7860 --workers 4
 
     # Or run directly:
     python -m server.app
