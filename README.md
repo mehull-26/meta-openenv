@@ -1,6 +1,6 @@
 ---
 title: Adaptive Learning System Environment Server
-emoji: robot
+emoji: "🤖"
 colorFrom: yellow
 colorTo: blue
 sdk: docker
