@@ -5,7 +5,7 @@ colorFrom: yellow
 colorTo: blue
 sdk: docker
 pinned: false
-app_port: 8000
+app_port: 7860
 tags:
   - openenv
   - pomdp
@@ -23,9 +23,10 @@ This directory is intentionally self-contained for OpenEnv and Docker submission
 - `env/`, `tasks/`, `models.py`, and `server/`: the runtime and API surface
 - `inference.py`: the submission runner that emits `[START]`, `[STEP]`, and `[END]` logs
 - `openenv.yaml`, `Dockerfile`, `requirements.txt`, and `pyproject.toml`: deployment and packaging metadata
+- `validate_submission.py`: pre-submission validation for OpenEnv, Docker, and inference log checks
 - `tests/test_sanity.py`: small regression coverage for deterministic benchmark behavior
 
-Local-only helpers, duplicate docs, and deployment convenience scripts were removed so the repo reflects only the actual submission path.
+Duplicate docs and deployment convenience scripts were removed, while `validate_submission.py` is retained as a submission check.
 
 ## Tasks
 
@@ -64,7 +65,7 @@ The environment is deterministic for a fixed seed and action history.
 .\.venv\Scripts\python.exe -m openenv.cli validate . -v
 
 # Run the local server from this directory
-python -m server.app --port 8000
+python -m server.app --port 7860
 
 # Run the submission inference script from this directory
 python inference.py
@@ -77,7 +78,7 @@ If you want to start directly on a different task:
 
 ```powershell
 $env:ADAPTIVE_LEARNING_TASK = "task2_add_subject"
-python -m server.app --port 8000
+python -m server.app --port 7860
 ```
 
 ## Deployment Note
@@ -101,5 +102,6 @@ adaptive_learning_system/
 |-- pyproject.toml
 |-- README.md
 |-- requirements.txt
+|-- validate_submission.py
 `-- uv.lock
 ```
