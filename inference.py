@@ -6,10 +6,12 @@ import asyncio
 import json
 import os
 import re
+import subprocess
 import sys
 import textwrap
+import time
 from pathlib import Path
-from typing import Iterable
+from typing import Any, Dict, Iterable, Optional
 
 if __package__ in (None, ""):
     repo_root = Path(__file__).resolve().parent.parent
@@ -17,9 +19,34 @@ if __package__ in (None, ""):
         sys.path.insert(0, str(repo_root))
 
 from openai import OpenAI
+from openenv.core.containers.runtime import LocalDockerProvider
 
 from adaptive_learning_system import AdaptiveLearningSystemAction, AdaptiveLearningSystemEnv
 from adaptive_learning_system.agent import choose_best_available_action
+
+
+class _Port7860Provider(LocalDockerProvider):
+    """LocalDockerProvider variant that maps to container port 7860 instead of 8000."""
+
+    def start_container(
+        self,
+        image: str,
+        port: Optional[int] = None,
+        env_vars: Optional[Dict[str, str]] = None,
+        **kwargs: Any,
+    ) -> str:
+        if port is None:
+            port = self._find_available_port()
+        self._container_name = self._generate_container_name(image)
+        cmd = ["docker", "run", "-d", "--name", self._container_name, "-p", f"{port}:7860"]
+        if env_vars:
+            for key, value in env_vars.items():
+                cmd.extend(["-e", f"{key}={value}"])
+        cmd.append(image)
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        self._container_id = result.stdout.strip()
+        time.sleep(1)
+        return f"http://localhost:{port}"
 
 API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-72B-Instruct")
@@ -382,6 +409,7 @@ async def create_env(task_name: str) -> AdaptiveLearningSystemEnv:
 
     return await AdaptiveLearningSystemEnv.from_docker_image(
         LOCAL_IMAGE_NAME,
+        provider=_Port7860Provider(),
         env_vars={"ADAPTIVE_LEARNING_TASK": task_name},
     )
 
