@@ -166,8 +166,8 @@ def validate_inference_output(output: str) -> None:
         if end_match:
             ends += 1
             score = float(end_match.group("score"))
-            if not 0.0 <= score <= 1.0:
-                raise RuntimeError(f"Task score out of range [0,1]: {line}")
+            if not 0.0 < score < 1.0:
+                raise RuntimeError(f"Task score must be strictly within (0,1): {line}")
             continue
         raise RuntimeError(f"Unexpected stdout line from inference.py: {line}")
 

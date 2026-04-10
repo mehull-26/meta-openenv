@@ -61,6 +61,12 @@ class RuntimeSanityTests(unittest.TestCase):
             self.assertTrue(rewards)
             self.assertLess(sum(rewards) / len(rewards), 0.05)
 
+    def test_final_task_scores_stay_strictly_between_zero_and_one(self) -> None:
+        for task_name in TASKS:
+            _, observation = _run_wait_policy(task_name)
+            self.assertGreater(observation.grader_score, 0.0)
+            self.assertLess(observation.grader_score, 1.0)
+
     def test_task1_concept_graph_gates_introductions_by_prerequisites(self) -> None:
         runtime = AdaptiveLearningRuntime(task_name="task1_review", seed=7)
         observation = runtime.reset(task_name="task1_review")
@@ -128,7 +134,8 @@ class RuntimeSanityTests(unittest.TestCase):
         while not observation.done:
             observation = runtime.step(AdaptiveLearningSystemAction(action_type="Wait"))
 
-        self.assertEqual(wait_observation.grader_score, 0.0)
+        self.assertGreater(wait_observation.grader_score, 0.0)
+        self.assertLess(wait_observation.grader_score, 0.01)
         self.assertEqual(wait_observation.task_metrics["introduced_ratio"], 0.0)
         self.assertGreater(observation.grader_score, wait_observation.grader_score)
         self.assertEqual(observation.task_metrics["introduced_ratio"], 1.0)

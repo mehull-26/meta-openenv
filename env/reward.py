@@ -108,6 +108,9 @@ def compute_reward(
             negative_utility += REWARD_WEIGHTS["frustration_penalty"]
             notes.append("Repeated incorrect answers increased frustration risk.")
 
+    # Assess flows through the observation path above (correct/partial/incorrect/skipped)
+    # without a named bonus — calibration value is captured through the belief update.
+
     if action_type == "Introduce" and observation and observation.outcome in {"correct", "partial"}:
         multiplier = 1.0 if observation.outcome == "correct" else 0.5
         positive_utility += REWARD_WEIGHTS["exploration_bonus"] * multiplier

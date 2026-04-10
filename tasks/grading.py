@@ -11,6 +11,9 @@ from adaptive_learning_system.env.types import (
     clamp,
 )
 
+MIN_SUBMISSION_SCORE = 0.001
+MAX_SUBMISSION_SCORE = 0.999
+
 
 def _mean(values: list[float]) -> float:
     if not values:
@@ -22,6 +25,12 @@ def _normalized_progress(belief: BeliefConceptState | None, target_mastery: floa
     if belief is None or target_mastery <= 0:
         return 0.0
     return clamp(belief.estimated_mastery / target_mastery)
+
+
+def _submission_score(value: float) -> float:
+    """Keep task scores strictly inside (0, 1) after three-decimal log formatting."""
+
+    return clamp(value, minimum=MIN_SUBMISSION_SCORE, maximum=MAX_SUBMISSION_SCORE)
 
 
 def grade_task1_review(
@@ -38,7 +47,7 @@ def grade_task1_review(
     retained_ratio = (
         sum(1 for belief in beliefs.values() if belief.estimated_mastery >= RETENTION_THRESHOLD) / total
     )
-    score = clamp((0.7 * average_mastery) + (0.3 * retained_ratio))
+    score = _submission_score((0.7 * average_mastery) + (0.3 * retained_ratio))
     return score, {
         "average_mastery": round(average_mastery, 4),
         "retained_ratio": round(retained_ratio, 4),
@@ -116,7 +125,7 @@ def grade_task2_add_subject(
         + (0.45 * _mean([rate_of_change_progress, limits_progress]))
         + (0.25 * derivatives_progress)
     )
-    score = clamp(
+    score = _submission_score(
         introduced_ratio
         * ((0.60 * maintenance_score) + (0.40 * expansion_score))
         * (1.0 - (0.75 * collapse_ratio))
@@ -169,6 +178,8 @@ def grade_task3_triage(
         )
         / max(len(focus_concepts), 1)
     )
+    # Normalize to a target average gain of 0.18, calibrated to the gap between the
+    # focus concepts' starting average mastery (~0.37) and RETENTION_THRESHOLD (0.55).
     rescue_gain_ratio = clamp(
         _mean(
             [
@@ -213,7 +224,7 @@ def grade_task3_triage(
         (1.0 - (0.65 * unresolved_risk_ratio))
         * (1.0 - (0.50 * regression_ratio))
     )
-    score = clamp(base_score * max(0.0, risk_discount))
+    score = _submission_score(base_score * max(0.0, risk_discount))
     return score, {
         "focus_average_mastery": round(focus_average_mastery, 4),
         "focus_retained_ratio": round(focus_retained_ratio, 4),
